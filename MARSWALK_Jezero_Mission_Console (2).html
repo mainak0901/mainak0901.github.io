@@ -1,0 +1,102 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MARSWALK — Jezero Mission Console</title></head><body><div id="mw-app" class="mw" data-app-block-stream-enter="">
+<style>
+body{margin:0;background:#080f18}
+.mw{font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#09111b;color:#e7edf5;border:1px solid #253446;border-radius:14px;overflow:hidden;font-size:12px;line-height:1.5}
+.mw *{box-sizing:border-box}
+.mw button,.mw select{font:inherit;cursor:pointer}
+.mw button{border:1px solid #334454;background:#142333;color:#e7edf5;border-radius:7px;padding:8px 11px}
+.mw button:hover{border-color:#d5a070}
+.mw button.active{background:#2e3d4a;border-color:#de955e;color:#ffd2af}
+.mw .top{display:flex;gap:14px;align-items:center;justify-content:space-between;padding:14px 17px;background:#101b28;border-bottom:1px solid #263543;flex-wrap:wrap}
+.mw .brand{font-size:17px;font-weight:900;letter-spacing:.12em;color:#f3f7fb}
+.mw .brand i{font-style:normal;color:#e4a270}
+.mw .small{color:#879eaf;font-size:10px;letter-spacing:.09em}
+.mw .led{display:inline-block;background:#6ed9a3;width:7px;height:7px;border-radius:50%;margin-right:6px}
+.mw .actions{display:flex;gap:7px;flex-wrap:wrap}
+.mw .body{display:grid;grid-template-columns:205px minmax(0,1fr) 218px;min-height:520px}
+.mw .sidebar,.mw .details{background:#101a26;padding:15px 12px;min-width:0}
+.mw .sidebar{border-right:1px solid #273645}
+.mw .details{border-left:1px solid #273645}
+.mw h4{font-size:10px;letter-spacing:.16em;color:#91aabe;font-weight:800;margin:4px 0 12px;text-transform:uppercase}
+.mw .block{border-bottom:1px solid #263542;margin-bottom:16px;padding-bottom:14px}
+.mw label{display:block;color:#b3c3d1;margin:9px 0 5px;font-size:11px}
+.mw select{background:#172532;color:#f1f5f9;border:1px solid #3b4c5d;border-radius:6px;width:100%;padding:9px 7px}
+.mw .wide{width:100%;margin-top:8px}
+.mw .lay{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.mw .mapWrap{position:relative;overflow:hidden;min-height:520px;background:radial-gradient(ellipse at 43% 50%,#423126 0%,#251f22 55%,#111c25 100%);touch-action:none;cursor:grab}
+.mw .mapWrap:active{cursor:grabbing}
+.mw .tilebox{position:absolute;inset:0;overflow:hidden}
+.mw .tilebox img{position:absolute;display:block;width:256px;height:256px;max-width:none;user-select:none;pointer-events:none}
+.mw .overlay{position:absolute;inset:0;pointer-events:none;width:100%;height:100%;overflow:hidden}
+.mw .pins{position:absolute;inset:0;pointer-events:none}
+.mw .pin{position:absolute;transform:translate(-50%,-100%);pointer-events:auto;border:0;background:transparent;padding:0;color:#fff;filter:drop-shadow(0px 2px 4px #000);max-width:160px;text-align:center}
+.mw .pin span{display:inline-block;background:#e7a36d;color:#15212a;border:2px solid #ffe0be;border-radius:50%;width:15px;height:15px;box-shadow:0 0 0 5px #e7a36d35}
+.mw .pin small{display:block;margin-top:5px;background:#101a27df;border:1px solid #576879;border-radius:4px;padding:3px 5px;font-weight:700;white-space:nowrap;font-size:10px}
+.mw .pin.goal span{background:#73d4ff;border-color:#d3f4ff}
+.mw .pin.mid span{background:#ffc66d;border-color:#fff1cc}
+.mw .maphead{position:absolute;top:12px;left:12px;pointer-events:none;background:#091520d9;padding:9px 12px;border:1px solid #31475a;border-radius:8px}
+.mw .zoom{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:6px}
+.mw .zoom button{font-size:19px;width:33px;height:33px;padding:0}
+.mw .readout{position:absolute;bottom:12px;left:12px;right:12px;pointer-events:none;background:#0c1825e8;border:1px solid #304557;padding:9px 12px;border-radius:8px;display:flex;gap:13px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.mw .datum{font-weight:800;font-size:19px;color:#f5b47c}
+.mw .stat{padding:12px;background:#162635;border:1px solid #304454;border-radius:9px;margin-bottom:8px}
+.mw .stat strong{font-size:19px;color:#f8fafd}
+.mw .stat small{display:block;color:#8fa7b8;font-size:10px;margin-bottom:3px}
+.mw .note{font-size:11px;color:#adbfca;line-height:1.6}
+.mw .warn{border-left:2px solid #eaa56c;padding:8px 10px;background:#32251c80;color:#ebc9ab;font-size:11px;border-radius:0 5px 5px 0}
+.mw .legend{display:flex;gap:11px;align-items:center;flex-wrap:wrap;padding:9px 14px;background:#0e1925;border-top:1px solid #273a49;color:#9fb1be;font-size:10px}
+.mw .line{display:inline-block;background:#f4b678;width:19px;height:3px;margin-right:5px;vertical-align:middle}
+.mw .import{border:1px dashed #50647a;border-radius:7px;display:block;text-align:center;padding:12px 7px;cursor:pointer;color:#b8cbdb;font-size:11px}
+.mw .import:hover{background:#1a2b39}
+.mw .import input{display:none}
+.mw .foot{font-size:10px;color:#7d94a7;padding:10px 14px;background:#0d1721;border-top:1px solid #263847}
+.mw .mw-input{width:100%;accent-color:#dfa06c}
+@media(max-width:770px){.mw .body{grid-template-columns:1fr}.mw .mapWrap{min-height:420px;grid-row:1}.mw .sidebar,.mw .details{border:0;border-top:1px solid #283948}.mw .sidebar{grid-row:2}.mw .details{grid-row:3}.mw .details{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mw .details h4,.mw .details .warn,.mw .details .note{grid-column:1/-1}}
+</style>
+<div class="top">
+  <div><div class="brand">MARS<i>WALK</i> <span style="font-size:10px;color:#819aa9;font-weight:500">/ JEZERO</span></div><div class="small">EXPLORATION OPERATIONS CONSOLE · MARS 2020</div></div>
+  <div class="actions"><button id="mw-reset">Reset view</button><button id="mw-export" style="background:#b97946;color:#fff;border-color:#d8975f;font-weight:800">Export HTML ↧</button></div>
+</div>
+<div class="body">
+  <aside class="sidebar">
+    <div class="block"><h4>01 / Orbital basemap</h4>
+      <div class="lay"><button data-base="ctx" class="active">CTX · 6 m</button><button data-base="hirise">HiRISE</button></div>
+      <p class="note" style="font-size:10px;margin-bottom:0">NASA Mars Trek WMTS · MRO orbital imagery. Requires internet.</p>
+    </div>
+    <div class="block"><h4>02 / EVA navigation</h4>
+      <label>Starting position</label><select id="mw-start"><option value="landing">Octavia E. Butler</option><option value="belva">Belva Crater</option><option value="delta">Western fan vicinity*</option></select>
+      <label>Science destination</label><select id="mw-end"><option value="belva">Belva Crater</option><option value="landing">Octavia E. Butler</option><option value="delta">Western fan vicinity*</option><option value="custom">Custom destination</option></select>
+      <label>Route mode</label><select id="mw-mode"><option value="direct">Direct-distance baseline</option><option value="via">Via western fan vicinity*</option></select>
+      <button class="wide" id="mw-plan" style="background:#bb7b48;border-color:#dca16b;color:white;font-weight:800">Calculate route</button>
+      <button class="wide" id="mw-choose">Choose destination on map</button>
+    </div>
+    <div class="block"><h4>03 / Scientific data</h4>
+      <label class="import">+ Load Mastcam-Z CSV<br><span style="font-size:9px;color:#819aa9">Plot observation locations</span><input type="file" accept=".csv,text/csv" id="mw-csv"></label>
+      <div class="note" id="mw-csvmsg" style="margin-top:9px">Database described: 12,209 spectral ROIs, sols 0–1700. Import CSV to show actual observations.</div>
+    </div>
+    <div><h4>04 / EVA assumptions</h4><label>Assumed walking speed <strong id="mw-speedText">1.3 km/h</strong></label><input class="mw-input" id="mw-speed" type="range" min="0.5" max="2" step="0.1" value="1"></div>
+  </aside>
+  <main class="mapWrap" id="mw-map">
+    <div class="tilebox" id="mw-tiles"></div>
+    <svg class="overlay" id="mw-routes" aria-label="Route overlays" viewBox="0 0 346 751"></svg>
+    <div class="pins" id="mw-pins"></div>
+    <div class="maphead"><div class="small"><span class="led"></span><span id="mw-imageryStatus">IMAGERY CONNECTION UNAVAILABLE</span></div><div style="font-size:15px;font-weight:800;margin-top:3px">Jezero Crater</div><div class="small" id="mw-coords">18.5571°N · 77.4634°E</div></div>
+    <div class="zoom"><button id="mw-zoomin">+</button><button id="mw-zoomout">−</button><button id="mw-home" style="font-size:14px">⌖</button></div>
+    <div class="readout"><div><div class="small">PLANNED DISTANCE</div><div class="datum" id="mw-mapdist">0.00 km</div></div><div style="text-align:right"><div class="small">MAP SCALE · APPROXIMATE</div><div id="mw-scale" style="font-size:11px">100 px ≈ 1930 m</div></div></div>
+  </main>
+  <aside class="details">
+    <h4>Mission analysis</h4>
+    <div class="stat"><small>Distance on Mars</small><strong id="mw-dist">0.00 km</strong></div>
+    <div class="stat"><small>Walking time · theoretical</small><strong id="mw-time">0.0 h</strong></div>
+    <div class="stat"><small>Selected stop</small><div id="mw-site" style="font-weight:800;font-size:14px">Belva Crater</div><div id="mw-sitecoords" class="small" style="margin-top:5px">18.4800°N · 77.3800°E</div></div>
+    <h4>Scientific interpretation</h4>
+    <div class="note" id="mw-science">A named crater in the Jezero western fan region, providing a scientifically interesting view into exposed sedimentary deposits.</div>
+    <div class="warn" style="margin-top:15px">Route is a geometric planning baseline, <strong>not a slope-validated or EVA-certified path</strong>. Surface obstacles, life-support constraints and actual terrain hazards are not yet evaluated.</div>
+    <p class="note" style="margin-top:12px">* Western fan point is an approximate region marker, not a surveyed field waypoint.</p>
+  </aside>
+</div>
+<div class="legend"><span><span class="line"></span> Proposed path</span><span style="color:#efaf79">●</span> Starting location <span style="color:#82d8ff">●</span> Destination <span style="color:#b2a2ff">●</span> Imported rover observations <span style="margin-left:auto">Mars radius: 3,396.19 km</span></div>
+<div class="foot">Data sources: NASA/JPL/USGS Mars Trek (live tiles), NASA Mars 2020, USGS Jezero site references, Mastcam-Z metadata (user-supplied). A live internet connection is required for orbital tile imagery. Scientific values are never inferred from visual texture alone.</div>
+
+
+</div></body></html>
